@@ -14,6 +14,7 @@ import SearchBar from "./components/SearchBar"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from "./pages/Verify"
+import MpesaPayment from "./pages/Mpesa"
 
 
 const App = () => {
@@ -33,6 +34,7 @@ const App = () => {
      <Route path="/place-order" element={<PlaceOrder/>}/>
      <Route path="/orders" element={<Order/>}/>
      <Route path="/verify" element={<Verify/>}/>
+     <Route path="/mpesa"  element={<MpesaPayment/>} />
 
 
     </Routes>

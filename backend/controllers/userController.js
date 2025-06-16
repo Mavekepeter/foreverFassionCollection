@@ -41,6 +41,7 @@ const registerUser = async (req,res)=>{
             return res.json({success:false,message:"user alreagy exists"})
         }
         //validating user email format and strong password
+        
         if (!validator.isEmail(email)) {
             return res.json({success:false,message:"Please enter a valid email"})
         }
