@@ -139,7 +139,7 @@ const minutes = String(now.getMinutes()).padStart(2, '0');
 const seconds = String(now.getSeconds()).padStart(2, '0');
 const timestamp = `${year}${month}${date}${hours}${minutes}${seconds}`;
 
-console.log("Generated Timestamp:", timestamp); // Debugging
+console.log("Generated Timestamp:", timestamp); 
 
     const password = Buffer.from(`${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`).toString('base64');
 
@@ -153,7 +153,7 @@ console.log("Generated Timestamp:", timestamp); // Debugging
         PartyB: process.env.MPESA_SHORTCODE,
         PhoneNumber: phone,
         CallBackURL: process.env.MPESA_CALLBACK_URL,
-        AccountReference: 'Animal Health Management System',
+        AccountReference: 'be smart',
         TransactionDesc: 'Payment for services'
     };
 
@@ -171,14 +171,23 @@ console.log("Generated Timestamp:", timestamp); // Debugging
 export const mpesaCallback = (req, res) => {
     console.log('MPesa Callback:', req.body);
 
-    const { Body } = req.body;
-    if (Body.stkCallback.ResultCode === 0) {
-        console.log('Payment Successful:', Body.stkCallback.CallbackMetadata);
-    } else {
-        console.log('Payment Failed:', Body.stkCallback.ResultDesc);
-    }
+    const body = req.body?.Body;
 
-    res.status(200).json({ message: 'Callback received' });
+    if (body && body.stkCallback) {
+        const { ResultCode, ResultDesc, CallbackMetadata } = body.stkCallback;
+
+        if (ResultCode === 0) {
+            console.log('✅ Payment Successful:', CallbackMetadata);
+            // Optionally: update the DB with payment status
+        } else {
+            console.log('❌ Payment Failed:', ResultDesc);
+        }
+
+        res.status(200).json({ message: 'Callback received' });
+    } else {
+        console.error('⚠️ Invalid callback structure:', req.body);
+        res.status(400).json({ message: 'Invalid callback structure' });
+    }
 };
 
 
@@ -187,8 +196,9 @@ const placeOrderRazorpay = async (req,res) =>{
     try {
         const {userId,items,amount,address} = req.body;
         const orderData = {
-            userId,
+            userId, 
             items,
+            MPESA_CALLBACK_URL,
             address,
             amount,
             paymentMethod:"Razorpay",
